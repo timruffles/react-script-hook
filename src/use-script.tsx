@@ -16,15 +16,13 @@ export default function useScript({
 }: ScriptProps): [boolean, ErrorState] {
     const isMounted = useIsMounted();
     const [loading, setLoading] = useState(true);
+    const [inserted, setInserted] = useState(false);
     const [error, setError] = useState<ErrorState>(null);
 
     useEffect(() => {
         if (!isBrowser) return;
 
-        if (document.querySelector(`script[src="${src}"]`)) {
-            if (isMounted()) {
-                setLoading(false);
-            }
+        if (inserted) {
             return;
         }
 
@@ -54,6 +52,7 @@ export default function useScript({
         scriptEl.addEventListener('error', handleError);
 
         document.body.appendChild(scriptEl);
+        setInserted(true);
 
         return () => {
             scriptEl.removeEventListener('load', handleLoad);
